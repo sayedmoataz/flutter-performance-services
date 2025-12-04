@@ -123,7 +123,6 @@ After:  <1 second
 4. Push (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
-See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## 📄 License
 
