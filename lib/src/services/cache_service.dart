@@ -1,7 +1,6 @@
 import 'dart:async';
 
 /// Smart caching service that prevents duplicate API calls
-/// Follows Single Responsibility Principle (SRP)
 class CacheService {
   CacheService._internal();
   static final CacheService instance = CacheService._internal();
@@ -23,7 +22,7 @@ class CacheService {
     Future<T> Function() loader, {
     Duration? expiryAfter,
   }) async {
-    // Dependency Inversion: External loader strategy
+    // External loader strategy
     if (_loadingTasks.containsKey(key)) {
       return await _loadingTasks[key]!.future as T;
     }
@@ -41,7 +40,7 @@ class CacheService {
       _cache[key] = result;
       completer.complete(result);
 
-      // Optional expiry (Open/Closed Principle)
+      // Optional expiry
       if (expiryAfter != null) {
         _scheduleExpiry(key, expiryAfter);
       }
@@ -69,9 +68,9 @@ class CacheService {
     _cache.clear();
   }
 
-  /// Cache size getter (Open for extension)
+  /// Cache size getter
   int get cacheSize => _cache.length;
 
-  /// Cache keys (Interface Segregation)
+  /// Cache keys
   Iterable<String> get cacheKeys => _cache.keys;
 }

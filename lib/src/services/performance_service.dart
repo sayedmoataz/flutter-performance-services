@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:performance_monitor/src/services/cache_service.dart';
 
 /// Performance optimization service with pre-warming capabilities
-/// Single Responsibility: App initialization optimization only
 class PerformanceOptimizationService {
   PerformanceOptimizationService._();
   static final PerformanceOptimizationService instance =
