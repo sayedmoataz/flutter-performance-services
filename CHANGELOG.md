@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 (2025-12-04)
+* Fix pub points verification
+- Updated dev dependencies
+
 ## 1.0.0 (2025-12-04)
 
 * Initial release of Flutter Performance Monitor & Cache Service

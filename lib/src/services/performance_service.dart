@@ -8,14 +8,14 @@ import 'package:performance_monitor/src/services/cache_service.dart';
 /// Single Responsibility: App initialization optimization only
 class PerformanceOptimizationService {
   PerformanceOptimizationService._();
-  static final PerformanceOptimizationService instance = 
+  static final PerformanceOptimizationService instance =
       PerformanceOptimizationService._();
 
   final CacheService _cacheService = CacheService.instance;
   bool _isInitialized = false;
 
   /// Initialize performance optimizations
-  /// 
+  ///
   /// Call this in main() before runApp()
   /// ```
   /// await PerformanceOptimizationService.instance.initialize();

@@ -12,7 +12,7 @@ void main() async {
 
   final perf = PerformanceOptimizationService.instance;
   await perf.initialize();
-  
+
   await PerformanceMonitor.measureAsync('Smart Cache Demo', () async {
     await perf.getCachedOrLoad('user_profile', () async {
       await Future.delayed(const Duration(milliseconds: 200));
@@ -64,9 +64,9 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => PerformanceMonitor.printTimingReport(),
-              child: const Text('Refresh Report'),
+            const ElevatedButton(
+              onPressed: PerformanceMonitor.printTimingReport,
+              child: Text('Refresh Report'),
             ),
             ElevatedButton(
               onPressed: () async {
