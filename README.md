@@ -1,119 +1,143 @@
-
 # performance_monitor
 
 [![Pub](https://img.shields.io/badge/pub.dev-published-brightgreen)](https://pub.dev/packages/performance_monitor)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Test Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen.svg)](https://pub.dev/packages/performance_monitor/score)
+Flutter Performance Monitor with Optional Smart Cache
 
-**Flutter Performance Monitor & Smart Cache Service**
-
-**Reduce app startup from 30+ seconds → <1 second** with precise timing & smart caching.
+Lightweight timing utilities for measuring startup and async operations, plus an optional cache layer to deduplicate expensive calls.
 
 ## Installation
 
-```
-dependencies:
-  performance_monitor: ^1.0.0
-```
+Install the package from pub.dev or add it to your project:
 
+- pubspec.yaml
 ```
-flutter pub add performance_monitor
+  dependencies:
+    performance_monitor: ^1.1.0
 ```
+- CLI
+
+  ```flutter pub add performance_monitor```
 
 ## Quick Start
 
-### 1. Time your app startup
-```
+### 1) Time your app startup (Timing-only)
+
+```dart
 import 'package:performance_monitor/performance_monitor.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Start total startup timing
   PerformanceMonitor.startTimer('App Startup');
-  
-  await PerformanceMonitor.measureAsync('Firebase', () async {
-    await Firebase.initializeApp();
+
+  // Measure essential startup services
+  await PerformanceMonitor.measureAsync('Essential Services', () async {
+    // Replace with actual startup tasks, e.g. Firebase.initializeApp(), config loading, etc.
+    await Future.delayed(const Duration(milliseconds: 300));
   });
-  
-  runApp(MyApp()); // Render UI FIRST!
-  
-  PerformanceMonitor.printTimingReport(); // See detailed report
+
+  // Optional: render UI after timing measurements begin
+  runApp(const MyApp());
+
+  // End startup timing and print report
+  PerformanceMonitor.endTimer('App Startup');
+  PerformanceMonitor.printTimingReport();
 }
 ```
 
-### 2. Smart caching (no duplicate API calls)
-```
+### 2) Smart caching (optional, deduplicates API calls)
+
+- Initialize the cache service (wrapper is optional but recommended)
+```dart
 final perf = PerformanceOptimizationService.instance;
 await perf.initialize();
+```
 
+- Use the cache to load data with deduplication
+```dart
 final userData = await perf.getCachedOrLoad(
   'user_profile',
-  () => api.fetchUserProfile(),
+  () => fetchUserProfile(), // your loader returning Future<T>
 );
 ```
+
+Notes:
+- The caching layer is optional. PerformanceMonitor remains focused on timing; the cache layer provides deduplication for expensive calls when needed.
+- The sample demonstrates that the first call incurs latency, while subsequent calls reuse the cached result.
 
 ## Sample Output
 
 ```
 📊 PERFORMANCE REPORT
 ==================================================
-Essential Services             :  312ms 45.2%
-Smart Cache Demo               :  218ms 31.6%
-Total App Startup              :   89ms 12.9%
+App Startup                  :  350ms 28.1%
+Essential Services           :  300ms 24.0%
+Smart Cache Demo             :  218ms 17.4%
+Total App Startup            :  868ms 100.0%
 ==================================================
-TOTAL:   689ms
+TOTAL: 868ms
 ```
 
 ## API Reference
 
 ### PerformanceMonitor
-```
-// Measure async operations
-await PerformanceMonitor.measureAsync('API Call', apiCall);
 
-// Get bottlenecks
-final slowest = PerformanceMonitor.getSlowestOperation(100);
-final slowOps = PerformanceMonitor.getSlowOperations(100);
+- measureAsync: Measure async operations
+  await PerformanceMonitor.measureAsync('API Call', apiCall);
 
-// Detailed report
-PerformanceMonitor.printTimingReport();
-```
+- startTimer / endTimer: Manual timing blocks
+  PerformanceMonitor.startTimer('Long Task');
+  // ...
+  PerformanceMonitor.endTimer('Long Task');
+
+- getSlowestOperation(thresholdMs)```final slowest = PerformanceMonitor.getSlowestOperation(100);```
+
+- getSlowOperations(thresholdMs)
+    ```final slowOps = PerformanceMonitor.getSlowOperations(100);```
+
+- printTimingReport: Print detailed timing report (percentages)
 
 ### PerformanceOptimizationService
-```
-// Initialize once
-await PerformanceOptimizationService.instance.initialize();
 
-// Smart caching
-await perf.getCachedOrLoad('key', expensiveLoader);
-perf.clearCache('key'); // Manual eviction
-```
+- initialize: Initialize the caching layer (call once, typically at startup)
+    ```await PerformanceOptimizationService.instance.initialize();```
+
+- getCachedOrLoad(key, loader, { expiryAfter })
+    ```final data = await perf.getCachedOrLoad('key', expensiveLoader);```
+
+- clearCache(key), clearAllCache: Manual eviction controls
+    ```
+    perf.clearCache('key');
+    perf.clearAllCache();
+    ```
 
 ## Example
 
-Complete `example/` app shows real-world usage:
+Complete example usage is demonstrated in the [example/lib/main.dart](example/lib/main.dart). The app shows:
 
-```
-cd example
-flutter run
-```
+- Measuring total startup time
+- Timing essential async startup operations
+- Optional smart caching demo with a first slow call followed by cached reuse
 
-See [example/lib/main.dart](example/lib/main.dart) for full startup optimization.
+Build and Run
 
-## Features
+- Navigate to the example project:
+  ```cd example```
+- Get dependencies and run:
+  ```
+  flutter pub get
+  flutter run
+  ```
 
-- Precise operation timing (async/sync)
-- Smart caching with deduplication
-- Percentage breakdown & slowest ops detection
-- Zero runtime dependencies
-- iOS/Android
-- 95%+ test coverage
-- Production-ready (debug-only logs)
+Migration Notes
 
-## Real Results
+- Version 1.1.0 introduces a simplified, Future-based cache layer that prevents duplicate API calls by caching the underlying Future. Timing functionality remains the core feature of PerformanceMonitor.
+- The pubspec version should be bumped to 1.1.0 to reflect the new API and behavior.
+- Documentation emphasizes the optional nature of the caching layer and provides clear Quick Start usage for both timing and caching scenarios.
 
-```
-Before: 30+ seconds
-After:  <1 second
-```
 
 ## 🤝 Contributing
 
@@ -128,6 +152,3 @@ After:  <1 second
 
 [MIT](LICENSE)
 
----
-
-⭐ **Star if it saves you 29 seconds on startup!** ⭐

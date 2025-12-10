@@ -1,76 +1,57 @@
 import 'dart:async';
 
-/// Smart caching service that prevents duplicate API calls
+/// Smart caching service that prevents duplicate async calls by
+/// caching the underlying Future.
+///
+/// Note: Caching completed futures increases memory usage and can
+/// affect performance characteristics. Use consciously.
 class CacheService {
   CacheService._internal();
   static final CacheService instance = CacheService._internal();
 
-  final Map<String, dynamic> _cache = <String, dynamic>{};
-  final Map<String, Completer<dynamic>> _loadingTasks =
-      <String, Completer<dynamic>>{};
+  /// Stores Futures keyed by string.
+  /// Once a Future completes, its value is cached inside the Future itself.
+  final Map<String, Future<dynamic>> _futures = {};
 
-  /// Get cached data or load it if not cached
+  /// Get cached data or load it if not cached.
   ///
-  /// ```
-  /// final data = await CacheService.instance.getCachedOrLoad(
-  ///   'user_profile',
-  ///   () => api.fetchUser()
-  /// );
-  /// ```
+  /// The [loader] will be invoked at most once per [key].
   Future<T> getCachedOrLoad<T>(
     String key,
     Future<T> Function() loader, {
     Duration? expiryAfter,
-  }) async {
-    // External loader strategy
-    if (_loadingTasks.containsKey(key)) {
-      return await _loadingTasks[key]!.future as T;
+  }) {
+    final existing = _futures[key];
+    if (existing != null) {
+      // The existing future already has the correct type,
+      // we just need to cast the resolved value
+      return existing.then((value) => value as T);
     }
 
-    final cached = _cache[key];
-    if (cached != null) {
-      return cached as T;
+    // Create and store the new future
+    final future = loader();
+    _futures[key] = future;
+
+    if (expiryAfter != null) {
+      _scheduleExpiry(key, expiryAfter);
     }
 
-    final completer = Completer<T>();
-    _loadingTasks[key] = completer;
-
-    try {
-      final result = await loader();
-      _cache[key] = result;
-      completer.complete(result);
-
-      // Optional expiry
-      if (expiryAfter != null) {
-        _scheduleExpiry(key, expiryAfter);
-      }
-
-      return result;
-    } catch (e) {
-      completer.completeError(e);
-      rethrow;
-    } finally {
-      _loadingTasks.remove(key);
-    }
+    return future;
   }
 
   void _scheduleExpiry(String key, Duration duration) {
     Timer(duration, () => clearCache(key));
   }
 
-  /// Clear cache for specific key
   void clearCache(String key) {
-    _cache.remove(key);
+    _futures.remove(key);
   }
 
-  /// Clear all cache
   void clearAllCache() {
-    _cache.clear();
+    _futures.clear();
   }
 
-  /// Cache size getter
-  int get cacheSize => _cache.length;
+  int get cacheSize => _futures.length;
 
-  /// Cache keys
-  Iterable<String> get cacheKeys => _cache.keys;
+  Iterable<String> get cacheKeys => _futures.keys;
 }

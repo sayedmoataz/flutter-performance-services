@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0 (2025-12-10)
+* Simplified internal cache implementation using Future-based storage.
+* Improved example app to demonstrate timing vs optional caching.
+* Updated README to clarify responsibilities (monitor only vs cache layer).
+
 ## 1.0.1 (2025-12-04)
 * Fix pub points verification
 - Updated dev dependencies
