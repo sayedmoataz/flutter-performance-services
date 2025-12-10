@@ -1,6 +1,6 @@
 name: performance_monitor
-description: A Flutter package providing performance monitoring and smart caching to optimize app startup time.
-version: 1.0.1
+description: A Flutter package for lightweight performance monitoring with optional smart caching to optimize app startup time.
+version: 1.1.0
 homepage: https://github.com/sayedmoataz/flutter-performance-services
 repository: https://github.com/sayedmoataz/flutter-performance-services
 issue_tracker: https://github.com/sayedmoataz/flutter-performance-services/issues
