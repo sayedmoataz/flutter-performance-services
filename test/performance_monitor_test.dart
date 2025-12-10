@@ -100,9 +100,9 @@ void main() {
       expect(timings.first.duration, lessThan(50));
     });
 
-    test('startTimer/endTimer works manually', () {
+    test('startTimer/endTimer works manually', () async {
       PerformanceMonitor.startTimer('manual');
-      Future.delayed(const Duration(milliseconds: 20));
+      await Future.delayed(const Duration(milliseconds: 20));
       PerformanceMonitor.endTimer('manual');
 
       final timings = PerformanceMonitor.getTimingResults();
@@ -123,6 +123,7 @@ void main() {
     });
 
     test('getSlowestOperation returns slowest', () async {
+      // Run operations and ensure both complete
       await PerformanceMonitor.measureAsync('medium', () async {
         await Future.delayed(const Duration(milliseconds: 80));
       });
@@ -130,7 +131,8 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 150));
       });
 
-      final slowest = PerformanceMonitor.getSlowestOperation(50);
+      // Now check which is slowest after both have completed
+      final slowest = PerformanceMonitor.getSlowestOperation(100);
       expect(slowest, 'slowest');
     });
 
