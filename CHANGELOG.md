@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.1 (2025-12-12)
+## 1.1.2 (2025-12-12)
 
 * **Documentation**: Improved README.md formatting and syntax
   - Fixed markdown code blocks with proper language identifiers

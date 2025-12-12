@@ -17,7 +17,7 @@ Add the package to your project using one of the following methods:
 
 ```yaml
 dependencies:
-  performance_monitor: ^1.1.0
+  performance_monitor: ^1.1.2
 ```
 
 ### Using Flutter CLI
