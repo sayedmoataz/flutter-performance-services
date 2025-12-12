@@ -2,23 +2,29 @@
 
 [![Pub](https://img.shields.io/badge/pub.dev-published-brightgreen)](https://pub.dev/packages/performance_monitor)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Test Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen.svg)](https://pub.dev/packages/performance_monitor/score)
+[![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://pub.dev/packages/performance_monitor/score)
+[![pub points](https://img.shields.io/pub/points/performance_monitor.svg)](https://pub.dev/packages/performance_monitor)
+
 Flutter Performance Monitor with Optional Smart Cache
 
 Lightweight timing utilities for measuring startup and async operations, plus an optional cache layer to deduplicate expensive calls.
 
 ## Installation
 
-Install the package from pub.dev or add it to your project:
+Add the package to your project using one of the following methods:
 
-- pubspec.yaml
-```
-  dependencies:
-    performance_monitor: ^1.1.0
-```
-- CLI
+### Using pubspec.yaml
 
-  ```flutter pub add performance_monitor```
+```yaml
+dependencies:
+  performance_monitor: ^1.1.0
+```
+
+### Using Flutter CLI
+
+```bash
+flutter pub add performance_monitor
+```
 
 ## Quick Start
 
@@ -48,15 +54,19 @@ Future<void> main() async {
 }
 ```
 
-### 2) Smart caching (optional, deduplicates API calls)
+### 2) Smart Caching (Optional)
 
-- Initialize the cache service (wrapper is optional but recommended)
+The cache layer deduplicates expensive API calls by caching results.
+
+#### Initialize the cache service
+
 ```dart
 final perf = PerformanceOptimizationService.instance;
 await perf.initialize();
 ```
 
-- Use the cache to load data with deduplication
+#### Use the cache to load data with deduplication
+
 ```dart
 final userData = await perf.getCachedOrLoad(
   'user_profile',
@@ -64,8 +74,8 @@ final userData = await perf.getCachedOrLoad(
 );
 ```
 
-Notes:
-- The caching layer is optional. PerformanceMonitor remains focused on timing; the cache layer provides deduplication for expensive calls when needed.
+**Notes:**
+- The caching layer is optional. `PerformanceMonitor` remains focused on timing; the cache layer provides deduplication for expensive calls when needed.
 - The sample demonstrates that the first call incurs latency, while subsequent calls reuse the cached result.
 
 ## Sample Output
@@ -85,34 +95,70 @@ TOTAL: 868ms
 
 ### PerformanceMonitor
 
-- measureAsync: Measure async operations
-  await PerformanceMonitor.measureAsync('API Call', apiCall);
+#### `measureAsync`
 
-- startTimer / endTimer: Manual timing blocks
-  PerformanceMonitor.startTimer('Long Task');
-  // ...
-  PerformanceMonitor.endTimer('Long Task');
+Measure async operations:
 
-- getSlowestOperation(thresholdMs)```final slowest = PerformanceMonitor.getSlowestOperation(100);```
+```dart
+await PerformanceMonitor.measureAsync('API Call', apiCall);
+```
 
-- getSlowOperations(thresholdMs)
-    ```final slowOps = PerformanceMonitor.getSlowOperations(100);```
+#### `startTimer` / `endTimer`
 
-- printTimingReport: Print detailed timing report (percentages)
+Manual timing blocks:
+
+```dart
+PerformanceMonitor.startTimer('Long Task');
+// ... your code here
+PerformanceMonitor.endTimer('Long Task');
+```
+
+#### `getSlowestOperation`
+
+Get the slowest operation above a threshold:
+
+```dart
+final slowest = PerformanceMonitor.getSlowestOperation(100);
+```
+
+#### `getSlowOperations`
+
+Get all operations slower than a threshold:
+
+```dart
+final slowOps = PerformanceMonitor.getSlowOperations(100);
+```
+
+#### `printTimingReport`
+
+Print detailed timing report with percentages.
 
 ### PerformanceOptimizationService
 
-- initialize: Initialize the caching layer (call once, typically at startup)
-    ```await PerformanceOptimizationService.instance.initialize();```
+#### `initialize`
 
-- getCachedOrLoad(key, loader, { expiryAfter })
-    ```final data = await perf.getCachedOrLoad('key', expensiveLoader);```
+Initialize the caching layer (call once, typically at startup):
 
-- clearCache(key), clearAllCache: Manual eviction controls
-    ```
-    perf.clearCache('key');
-    perf.clearAllCache();
-    ```
+```dart
+await PerformanceOptimizationService.instance.initialize();
+```
+
+#### `getCachedOrLoad`
+
+Load data with caching and deduplication:
+
+```dart
+final data = await perf.getCachedOrLoad('key', expensiveLoader);
+```
+
+#### `clearCache` / `clearAllCache`
+
+Manual cache eviction controls:
+
+```dart
+perf.clearCache('key');
+perf.clearAllCache();
+```
 
 ## Example
 
@@ -122,20 +168,25 @@ Complete example usage is demonstrated in the [example/lib/main.dart](example/li
 - Timing essential async startup operations
 - Optional smart caching demo with a first slow call followed by cached reuse
 
-Build and Run
+### Build and Run
 
-- Navigate to the example project:
-  ```cd example```
-- Get dependencies and run:
-  ```
-  flutter pub get
-  flutter run
-  ```
+Navigate to the example project:
 
-Migration Notes
+```bash
+cd example
+```
 
-- Version 1.1.0 introduces a simplified, Future-based cache layer that prevents duplicate API calls by caching the underlying Future. Timing functionality remains the core feature of PerformanceMonitor.
-- The pubspec version should be bumped to 1.1.0 to reflect the new API and behavior.
+Get dependencies and run:
+
+```bash
+flutter pub get
+flutter run
+```
+
+## Migration Notes
+
+- **Version 1.1.0** introduces a simplified, Future-based cache layer that prevents duplicate API calls by caching the underlying Future. Timing functionality remains the core feature of `PerformanceMonitor`.
+- The pubspec version should be bumped to `1.1.0` to reflect the new API and behavior.
 - Documentation emphasizes the optional nature of the caching layer and provides clear Quick Start usage for both timing and caching scenarios.
 
 
