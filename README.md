@@ -2,7 +2,7 @@
 
 [![Pub](https://img.shields.io/badge/pub.dev-published-brightgreen)](https://pub.dev/packages/performance_monitor)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://pub.dev/packages/performance_monitor/score)
+[![Test Coverage](https://img.shields.io/badge/coverage-97.9%25-brightgreen.svg)](https://pub.dev/packages/performance_monitor/score)
 [![pub points](https://img.shields.io/pub/points/performance_monitor.svg)](https://pub.dev/packages/performance_monitor)
 
 Flutter Performance Monitor with Optional Smart Cache

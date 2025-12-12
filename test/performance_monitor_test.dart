@@ -7,6 +7,7 @@ void main() {
 
     setUp(() {
       service = PerformanceOptimizationService.instance;
+      service.clearAllCache();
     });
 
     test('initialize completes successfully', () async {
@@ -18,6 +19,31 @@ void main() {
       await service.initialize();
       await service.initialize(); // Call twice
       expect(service.isInitialized, true);
+    });
+
+    test('cacheSize returns correct count', () async {
+      await service.initialize();
+      await service.getCachedOrLoad('key1', () async => 'data1');
+      await service.getCachedOrLoad('key2', () async => 'data2');
+
+      expect(service.cacheSize, 2);
+    });
+
+    test('clearCache removes specific key via service', () async {
+      await service.initialize();
+      await service.getCachedOrLoad('to_clear', () async => 'data');
+
+      service.clearCache('to_clear');
+      expect(service.cacheSize, 0);
+    });
+
+    test('clearAllCache clears all via service', () async {
+      await service.initialize();
+      await service.getCachedOrLoad('key1', () async => 'data1');
+      await service.getCachedOrLoad('key2', () async => 'data2');
+
+      service.clearAllCache();
+      expect(service.cacheSize, 0);
     });
   });
 
@@ -68,7 +94,16 @@ void main() {
       expect(cacheService.cacheSize, 3);
     });
 
-    test('getCachedOrLoad propagates errors', () => throwsA(isA<Exception>()));
+    test('getCachedOrLoad propagates errors', () async {
+      Future<String> errorLoader() async {
+        throw Exception('Test error');
+      }
+
+      expect(
+        () => cacheService.getCachedOrLoad('error_key', errorLoader),
+        throwsA(isA<Exception>()),
+      );
+    });
     test('clearCache removes specific key', () async {
       await cacheService.getCachedOrLoad('to_clear', () async => 'data');
       cacheService.clearCache('to_clear');
@@ -79,6 +114,30 @@ void main() {
       await cacheService.getCachedOrLoad('key1', () async => 'data1');
       await cacheService.getCachedOrLoad('key2', () async => 'data2');
       cacheService.clearAllCache();
+      expect(cacheService.cacheSize, 0);
+    });
+
+    test('cacheKeys returns all cached keys', () async {
+      await cacheService.getCachedOrLoad('key1', () async => 'data1');
+      await cacheService.getCachedOrLoad('key2', () async => 'data2');
+
+      final keys = cacheService.cacheKeys.toList();
+      expect(keys.length, 2);
+      expect(keys, containsAll(['key1', 'key2']));
+    });
+
+    test('cache expiry removes key after duration', () async {
+      await cacheService.getCachedOrLoad(
+        'expiring_key',
+        () async => 'expiring_data',
+        expiryAfter: const Duration(milliseconds: 50),
+      );
+
+      expect(cacheService.cacheSize, 1);
+
+      // Wait for expiry
+      await Future.delayed(const Duration(milliseconds: 100));
+
       expect(cacheService.cacheSize, 0);
     });
   });
@@ -132,12 +191,23 @@ void main() {
       });
 
       // Now check which is slowest after both have completed
-      final slowest = PerformanceMonitor.getSlowestOperation(100);
+      final slowest = PerformanceMonitor.getSlowestOperation();
       expect(slowest, 'slowest');
     });
 
     test('printTimingReport handles empty timings gracefully', () {
       PerformanceMonitor.clear();
+      expect(PerformanceMonitor.printTimingReport, returnsNormally);
+    });
+
+    test('printTimingReport displays report with data', () async {
+      await PerformanceMonitor.measureAsync('op1', () async {
+        await Future.delayed(const Duration(milliseconds: 50));
+      });
+      await PerformanceMonitor.measureAsync('op2', () async {
+        await Future.delayed(const Duration(milliseconds: 30));
+      });
+
       expect(PerformanceMonitor.printTimingReport, returnsNormally);
     });
 
@@ -148,6 +218,20 @@ void main() {
 
       expect(result1, equals(result2));
       expect(result1, isNot(equals(result3)));
+    });
+
+    test('TimingResult toString formats correctly', () {
+      const result = TimingResult('test_operation', 150);
+      expect(result.toString(), 'test_operation: 150ms');
+    });
+
+    test('TimingResult hashCode is consistent', () {
+      const result1 = TimingResult('op1', 100);
+      const result2 = TimingResult('op1', 100);
+      const result3 = TimingResult('op2', 100);
+
+      expect(result1.hashCode, equals(result2.hashCode));
+      expect(result1.hashCode, isNot(equals(result3.hashCode)));
     });
   });
 
