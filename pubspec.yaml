@@ -5,9 +5,6 @@ homepage: https://github.com/sayedmoataz/flutter-performance-services
 repository: https://github.com/sayedmoataz/flutter-performance-services
 issue_tracker: https://github.com/sayedmoataz/flutter-performance-services/issues
 
-publishers: 
-  - homepage: https://sayed-moataz-portfolio-five.vercel.app
-
 environment:
   sdk: ">=3.0.0 <4.0.0"
   flutter: ">=3.10.0"

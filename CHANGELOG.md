@@ -8,7 +8,10 @@
   - Enhanced Installation section with clear subsections
   - Improved Smart Caching section with proper headings
   - Better formatting for Example and Migration Notes sections
-* **Metadata**: Added publisher information to pubspec.yaml
+* **Testing**: Significantly improved test coverage from 73.2% to 97.9%
+  - Added 11 new comprehensive tests
+  - Achieved 100% coverage on core modules (PerformanceMonitor, CacheService)
+  - Total of 25 tests, all passing
 
 ## 1.1.0 (2025-12-10)
 * Simplified internal cache implementation using Future-based storage.
