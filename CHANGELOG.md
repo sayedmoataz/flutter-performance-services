@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.1 (2025-12-12)
+
+* **Documentation**: Improved README.md formatting and syntax
+  - Fixed markdown code blocks with proper language identifiers
+  - Restructured API Reference section with better organization
+  - Enhanced Installation section with clear subsections
+  - Improved Smart Caching section with proper headings
+  - Better formatting for Example and Migration Notes sections
+* **Metadata**: Added publisher information to pubspec.yaml
+
 ## 1.1.0 (2025-12-10)
 * Simplified internal cache implementation using Future-based storage.
 * Improved example app to demonstrate timing vs optional caching.
